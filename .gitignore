@@ -1,0 +1,32 @@
+# IDEs and Editors
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+
+# System files
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Java/Maven Build
+target/
+*.class
+*.jar
+*.war
+*.ear
+
+# Environment variables (contains passwords and secrets)
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+logs/
+
+# Node/Frontend (if applicable later)
+node_modules/
+dist/
+.eslintcache
