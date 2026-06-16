@@ -1,13 +1,20 @@
 package com.bookstore.auth.service;
 
 import com.bookstore.auth.client.UserClient;
+import com.bookstore.auth.dto.request.LoginRequest;
 import com.bookstore.auth.dto.request.RegisterRequest;
+import com.bookstore.auth.dto.response.JwtResponse;
 import com.bookstore.common.dto.response.ApiResponse;
 import com.bookstore.auth.entity.AuthUser;
 import com.bookstore.auth.repository.AuthUserRepository;
+import com.bookstore.auth.security.JwtService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +29,8 @@ public class AuthService {
     private final BCryptPasswordEncoder passwordEncoder;
     private final EmailService emailService;
     private final UserClient userClient;
+    private final AuthenticationManager authenticationManager;
+    private final JwtService jwtService;
 
     public ApiResponse<Void> register(RegisterRequest request) {
         if (authUserRepository.existsByUsername(request.getUsername())) {
@@ -77,5 +86,28 @@ public class AuthService {
         user.setEnabled(true);
         authUserRepository.save(user);
         return ApiResponse.success("Kích hoạt tài khoản thành công!");
+    }
+
+    public ApiResponse<JwtResponse> login(LoginRequest request) {
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
+            );
+            if (!authentication.isAuthenticated()) {
+                return ApiResponse.error("Xác thực không thành công.");
+            }
+
+            AuthUser user = authUserRepository.findByUsername(request.getUsername())
+                    .orElseThrow();
+            if (!user.isEnabled()) {
+                return ApiResponse.error("Tài khoản chưa được kích hoạt hoặc đã bị khóa!");
+            }
+
+            String token = jwtService.generateToken(user);
+            return ApiResponse.success("Đăng nhập thành công!", new JwtResponse(token));
+
+        } catch (AuthenticationException e) {
+            return ApiResponse.error("Tên đăng nhập hoặc mật khẩu không đúng!");
+        }
     }
 }
