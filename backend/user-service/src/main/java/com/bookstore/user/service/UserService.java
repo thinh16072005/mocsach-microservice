@@ -37,4 +37,13 @@ public class UserService {
         userRepository.save(user);
         return ApiResponse.success("Profile đã được tạo.");
     }
+
+    public ApiResponse<User> getUserProfile(int userId) {
+        User user = userRepository.findById(userId)
+                .orElse(null);
+        if (user == null) {
+            return ApiResponse.error("Không tìm thấy thông tin người dùng!");
+        }
+        return ApiResponse.success("Lấy thông tin profile thành công!", user);
+    }
 }
