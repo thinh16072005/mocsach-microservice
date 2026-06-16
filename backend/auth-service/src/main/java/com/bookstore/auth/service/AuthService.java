@@ -1,6 +1,7 @@
 package com.bookstore.auth.service;
 
 import com.bookstore.auth.client.UserClient;
+import com.bookstore.auth.dto.request.ChangePasswordRequest;
 import com.bookstore.auth.dto.request.ForgotPasswordRequest;
 import com.bookstore.auth.dto.request.LoginRequest;
 import com.bookstore.auth.dto.request.RegisterRequest;
@@ -125,5 +126,27 @@ public class AuthService {
 
         emailService.sendForgotPasswordEmail(user.getEmail(), tempPassword);
         return ApiResponse.success("Mật khẩu tạm thời đã được gửi đến email của bạn.");
+    }
+
+    public ApiResponse<Void> changePassword(int userId, ChangePasswordRequest request) {
+        if (request.getOldPassword() == null || request.getOldPassword().isBlank() ||
+                request.getNewPassword() == null || request.getNewPassword().isBlank()) {
+            return ApiResponse.error("Mật khẩu không được để trống.");
+        }
+
+        AuthUser user = authUserRepository.findById(userId)
+                .orElse(null);
+        if (user == null) {
+            return ApiResponse.error("Người dùng không tồn tại!");
+        }
+
+        if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
+            return ApiResponse.error("Mật khẩu cũ không chính xác!");
+        }
+
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        authUserRepository.save(user);
+
+        return ApiResponse.success("Đổi mật khẩu thành công!");
     }
 }
