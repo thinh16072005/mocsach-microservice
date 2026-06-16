@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import java.util.List;
 
 @RestController
 @RequestMapping("/users")
@@ -39,4 +40,15 @@ public class UserController {
         }
         return ResponseEntity.ok(userService.getUserProfile(targetUserId));
     }
+
+    @GetMapping
+    public ResponseEntity<ApiResponse<List<com.bookstore.user.dto.response.UserResponse>>> getAllUsers(
+            @RequestHeader("X-User-Role") String loggedInUserRole) {
+        if (!"ADMIN".equals(loggedInUserRole)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(ApiResponse.error("Bạn không có quyền truy cập thông tin này!"));
+        }
+        return ResponseEntity.ok(userService.getAllUsers());
+    }
 }
+

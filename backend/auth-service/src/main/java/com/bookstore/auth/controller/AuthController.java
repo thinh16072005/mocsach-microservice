@@ -10,6 +10,8 @@ import com.bookstore.auth.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
@@ -50,4 +52,31 @@ public class AuthController {
         ApiResponse<Void> response = authService.changePassword(userId, request);
         return response.isSuccess() ? ResponseEntity.ok(response) : ResponseEntity.badRequest().body(response);
     }
+
+    @PostMapping("/register-by-admin")
+    public ResponseEntity<ApiResponse<Void>> registerByAdmin(@RequestBody RegisterRequest request) {
+        ApiResponse<Void> response = authService.registerByAdmin(request);
+        return response.isSuccess() ? ResponseEntity.ok(response) : ResponseEntity.badRequest().body(response);
+    }
+
+    @GetMapping("/users")
+    public ResponseEntity<ApiResponse<List<com.bookstore.common.dto.shared.AuthUserDto>>> getAllUsers() {
+        return ResponseEntity.ok(authService.getAllUsers());
+    }
+
+    @GetMapping("/users/{id}")
+    public ResponseEntity<ApiResponse<com.bookstore.common.dto.shared.AuthUserDto>> getUserById(@PathVariable int id) {
+        ApiResponse<com.bookstore.common.dto.shared.AuthUserDto> response = authService.getUserById(id);
+        return response.isSuccess() ? ResponseEntity.ok(response) : ResponseEntity.badRequest().body(response);
+    }
+
+    @PutMapping("/users/{id}/status")
+    public ResponseEntity<ApiResponse<Void>> updateStatus(
+            @PathVariable int id,
+            @RequestBody Map<String, Boolean> payload) {
+        boolean enabled = payload.getOrDefault("enabled", false);
+        ApiResponse<Void> response = authService.updateStatus(id, enabled);
+        return response.isSuccess() ? ResponseEntity.ok(response) : ResponseEntity.badRequest().body(response);
+    }
 }
+

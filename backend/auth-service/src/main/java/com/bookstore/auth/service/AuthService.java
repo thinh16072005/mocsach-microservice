@@ -18,9 +18,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Service;
-
+import java.util.List;
 import java.util.Map;
+import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
@@ -149,4 +149,65 @@ public class AuthService {
 
         return ApiResponse.success("Đổi mật khẩu thành công!");
     }
+
+    public ApiResponse<Void> registerByAdmin(RegisterRequest request) {
+        if (authUserRepository.existsByUsername(request.getUsername())) {
+            return ApiResponse.error("Username đã tồn tại.");
+        }
+        if (authUserRepository.existsByEmail(request.getEmail())) {
+            return ApiResponse.error("Email đã tồn tại.");
+        }
+
+        AuthUser authUser = createAndSaveAuthUser(request.getUsername(), request.getPassword(),
+                request.getEmail(), "CUSTOMER");
+
+        try {
+            userClient.initUserProfile(Map.of(
+                    "userId", authUser.getId(),
+                    "email", authUser.getEmail(),
+                    "firstName", request.getFirstName() != null ? request.getFirstName() : "",
+                    "lastName", request.getLastName() != null ? request.getLastName() : ""
+            ));
+        } catch (Exception e) {
+            log.warn("Could not init user profile: {}", e.getMessage());
+        }
+
+        emailService.sendActivationEmail(authUser.getEmail(), authUser.getActivationCode());
+        return ApiResponse.success("Người dùng được tạo thành công! Email xác nhận đã được gửi.");
+    }
+
+    public ApiResponse<List<com.bookstore.common.dto.shared.AuthUserDto>> getAllUsers() {
+        List<com.bookstore.common.dto.shared.AuthUserDto> users = authUserRepository.findAll().stream()
+                .map(u -> com.bookstore.common.dto.shared.AuthUserDto.builder()
+                        .id(u.getId())
+                        .username(u.getUsername())
+                        .email(u.getEmail())
+                        .enabled(u.isEnabled())
+                        .role(u.getRole())
+                        .build())
+                .collect(java.util.stream.Collectors.toList());
+        return ApiResponse.success("OK", users);
+    }
+
+    public ApiResponse<com.bookstore.common.dto.shared.AuthUserDto> getUserById(int id) {
+        AuthUser u = authUserRepository.findById(id).orElse(null);
+        if (u == null) return ApiResponse.error("Không tìm thấy user auth!");
+        com.bookstore.common.dto.shared.AuthUserDto dto = com.bookstore.common.dto.shared.AuthUserDto.builder()
+                .id(u.getId())
+                .username(u.getUsername())
+                .email(u.getEmail())
+                .enabled(u.isEnabled())
+                .role(u.getRole())
+                .build();
+        return ApiResponse.success("OK", dto);
+    }
+
+    public ApiResponse<Void> updateStatus(int id, boolean enabled) {
+        AuthUser u = authUserRepository.findById(id).orElse(null);
+        if (u == null) return ApiResponse.error("Không tìm thấy user auth!");
+        u.setEnabled(enabled);
+        authUserRepository.save(u);
+        return ApiResponse.success("Cập nhật trạng thái thành công!");
+    }
 }
+
