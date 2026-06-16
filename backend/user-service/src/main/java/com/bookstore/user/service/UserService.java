@@ -1,6 +1,7 @@
 package com.bookstore.user.service;
 
 import com.bookstore.common.dto.response.ApiResponse;
+import com.bookstore.user.dto.request.UpdateProfileRequest;
 import com.bookstore.user.entity.User;
 import com.bookstore.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -45,5 +46,24 @@ public class UserService {
             return ApiResponse.error("Không tìm thấy thông tin người dùng!");
         }
         return ApiResponse.success("Lấy thông tin profile thành công!", user);
+    }
+
+    public ApiResponse<User> updateUserProfile(int userId, UpdateProfileRequest request) {
+        User user = userRepository.findById(userId)
+                .orElse(null);
+        if (user == null) {
+            return ApiResponse.error("Không tìm thấy thông tin người dùng!");
+        }
+
+        if (request.getFirstName() != null) user.setFirstName(request.getFirstName());
+        if (request.getLastName() != null) user.setLastName(request.getLastName());
+        if (request.getPhoneNumber() != null) user.setPhoneNumber(request.getPhoneNumber());
+        if (request.getGender() != null) user.setGender(request.getGender());
+        if (request.getDateOfBirth() != null) user.setDateOfBirth(request.getDateOfBirth());
+        if (request.getDeliveryAddress() != null) user.setDeliveryAddress(request.getDeliveryAddress());
+        if (request.getAvatar() != null) user.setAvatar(request.getAvatar());
+
+        userRepository.save(user);
+        return ApiResponse.success("Cập nhật thông tin profile thành công!", user);
     }
 }
