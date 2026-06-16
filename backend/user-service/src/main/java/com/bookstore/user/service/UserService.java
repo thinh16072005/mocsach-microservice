@@ -95,4 +95,25 @@ public class UserService {
                 .avatar(u.getAvatar())
                 .build();
     }
+
+    public ApiResponse<Void> updateByAdmin(int userId, Map<String, Object> payload) {
+        User user = userRepository.findById(userId)
+                .orElse(null);
+        if (user == null) return ApiResponse.error("Người dùng không tồn tại!");
+
+        if (payload.containsKey("firstName")) user.setFirstName((String) payload.get("firstName"));
+        if (payload.containsKey("lastName")) user.setLastName((String) payload.get("lastName"));
+        if (payload.containsKey("phoneNumber")) user.setPhoneNumber((String) payload.get("phoneNumber"));
+        if (payload.containsKey("deliveryAddress")) user.setDeliveryAddress((String) payload.get("deliveryAddress"));
+
+        userRepository.save(user);
+
+        if (payload.containsKey("enabled")) {
+            boolean enabled = (Boolean) payload.get("enabled");
+            authClient.updateStatus(userId, enabled);
+        }
+
+        return ApiResponse.success("Cập nhật thành công.");
+    }
 }
+
