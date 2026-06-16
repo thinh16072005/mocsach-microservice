@@ -50,5 +50,19 @@ public class UserController {
         }
         return ResponseEntity.ok(userService.getAllUsers());
     }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<ApiResponse<Void>> updateByAdmin(
+            @RequestHeader("X-User-Role") String loggedInUserRole,
+            @PathVariable int id,
+            @RequestBody Map<String, Object> payload) {
+        if (!"ADMIN".equals(loggedInUserRole)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(ApiResponse.error("Bạn không có quyền thực hiện hành động này!"));
+        }
+        ApiResponse<Void> response = userService.updateByAdmin(id, payload);
+        return response.isSuccess() ? ResponseEntity.ok(response) : ResponseEntity.badRequest().body(response);
+    }
 }
+
 
