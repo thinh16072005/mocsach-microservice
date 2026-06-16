@@ -1,6 +1,7 @@
 package com.bookstore.auth.service;
 
 import com.bookstore.auth.client.UserClient;
+import com.bookstore.auth.dto.request.ForgotPasswordRequest;
 import com.bookstore.auth.dto.request.LoginRequest;
 import com.bookstore.auth.dto.request.RegisterRequest;
 import com.bookstore.auth.dto.response.JwtResponse;
@@ -109,5 +110,20 @@ public class AuthService {
         } catch (AuthenticationException e) {
             return ApiResponse.error("Tên đăng nhập hoặc mật khẩu không đúng!");
         }
+    }
+
+    public ApiResponse<Void> forgotPassword(ForgotPasswordRequest request) {
+        AuthUser user = authUserRepository.findByEmail(request.getEmail())
+                .orElse(null);
+        if (user == null) {
+            return ApiResponse.error("Email không tồn tại trong hệ thống.");
+        }
+
+        String tempPassword = RandomStringUtils.random(10, true, true);
+        user.setPassword(passwordEncoder.encode(tempPassword));
+        authUserRepository.save(user);
+
+        emailService.sendForgotPasswordEmail(user.getEmail(), tempPassword);
+        return ApiResponse.success("Mật khẩu tạm thời đã được gửi đến email của bạn.");
     }
 }
