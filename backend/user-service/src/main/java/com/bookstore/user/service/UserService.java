@@ -43,6 +43,39 @@ public class UserService {
                 .lastName(lastName)
                 .avatar("")
                 .build();
+
+        if (payload.containsKey("phoneNumber")) {
+            user.setPhoneNumber((String) payload.get("phoneNumber"));
+        }
+        if (payload.containsKey("deliveryAddress")) {
+            user.setDeliveryAddress((String) payload.get("deliveryAddress"));
+        }
+        if (payload.containsKey("gender")) {
+            String genderStr = (String) payload.get("gender");
+            if (genderStr != null && !genderStr.trim().isEmpty()) {
+                user.setGender(genderStr.trim().charAt(0));
+            }
+        }
+        if (payload.containsKey("dateOfBirth")) {
+            String dobStr = (String) payload.get("dateOfBirth");
+            if (dobStr != null && !dobStr.trim().isEmpty()) {
+                try {
+                    if (dobStr.contains("T")) {
+                        java.time.Instant instant = java.time.Instant.parse(dobStr);
+                        user.setDateOfBirth(new java.sql.Date(instant.toEpochMilli()));
+                    } else {
+                        user.setDateOfBirth(java.sql.Date.valueOf(dobStr.substring(0, 10)));
+                    }
+                } catch (Exception e) {
+                    try {
+                        user.setDateOfBirth(java.sql.Date.valueOf(dobStr.substring(0, 10)));
+                    } catch (Exception ex) {
+                        // ignore
+                    }
+                }
+            }
+        }
+
         userRepository.save(user);
         return ApiResponse.success("Profile đã được tạo.");
     }
@@ -207,6 +240,38 @@ public class UserService {
         if (payload.containsKey("lastName")) user.setLastName((String) payload.get("lastName"));
         if (payload.containsKey("phoneNumber")) user.setPhoneNumber((String) payload.get("phoneNumber"));
         if (payload.containsKey("deliveryAddress")) user.setDeliveryAddress((String) payload.get("deliveryAddress"));
+        if (payload.containsKey("email")) user.setEmail((String) payload.get("email"));
+
+        if (payload.containsKey("gender")) {
+            String genderStr = (String) payload.get("gender");
+            if (genderStr != null && !genderStr.trim().isEmpty()) {
+                user.setGender(genderStr.trim().charAt(0));
+            } else {
+                user.setGender(null);
+            }
+        }
+
+        if (payload.containsKey("dateOfBirth")) {
+            String dobStr = (String) payload.get("dateOfBirth");
+            if (dobStr != null && !dobStr.trim().isEmpty()) {
+                try {
+                    if (dobStr.contains("T")) {
+                        java.time.Instant instant = java.time.Instant.parse(dobStr);
+                        user.setDateOfBirth(new java.sql.Date(instant.toEpochMilli()));
+                    } else {
+                        user.setDateOfBirth(java.sql.Date.valueOf(dobStr.substring(0, 10)));
+                    }
+                } catch (Exception e) {
+                    try {
+                        user.setDateOfBirth(java.sql.Date.valueOf(dobStr.substring(0, 10)));
+                    } catch (Exception ex) {
+                        // ignore
+                    }
+                }
+            } else {
+                user.setDateOfBirth(null);
+            }
+        }
 
         userRepository.save(user);
 

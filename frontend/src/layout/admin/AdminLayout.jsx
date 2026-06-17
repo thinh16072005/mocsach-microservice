@@ -1,7 +1,6 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 import AdminSidebar from './components/AdminSidebar.jsx';
-import NotificationBell from './components/NotificationBell.jsx';
 
 const AdminLayout = () => {
     return (
@@ -54,7 +53,6 @@ const AdminLayout = () => {
 
             <div className='admin-layout'>
                 <div className='admin-header'>
-                    <NotificationBell />
                 </div>
                 <div className='admin-content'>
                     <div className='admin-content-inner'>

@@ -28,7 +28,7 @@ import {
     checkPhoneNumber,
     validateDateOfBirth } from "../utils/Validation.js";
 
-const IS_READ_ONLY = true;
+const IS_READ_ONLY = false;
 
 // Helper để reset form
 const getEmptyUserForm = () => ({
@@ -584,7 +584,7 @@ const UserManagement = () => {
                 phoneNumber: newUser.phoneNumber.trim() || "",
                 gender: newUser.gender ? newUser.gender.charAt(0) : '\0', //  Backend yêu cầu char
                 deliveryAddress: newUser.deliveryAddress.trim() || "",
-                enabled: false, //  Set enabled = false, chờ xác nhận email
+                enabled: true, //  Tự kích hoạt tài khoản luôn
             };
 
             // Xử lý dateOfBirth - gửi dạng ISO string
@@ -626,9 +626,8 @@ const UserManagement = () => {
             const responseData = await response.json();
             logResponse("Thêm người dùng", responseData);
 
-            //  Hiển thị thông báo chờ xác nhận email
-            toast.info(
-                `⏳ Người dùng ${newUser.email} đã được tạo!\n Một email xác nhận sẽ được gửi tới ${newUser.email}\n Người dùng cần click vào link trong email để kích hoạt tài khoản.`,
+            toast.success(
+                `🎉 Tài khoản ${newUser.username} đã được tạo và kích hoạt thành công!`,
                 { autoClose: 5000 }
             );
 

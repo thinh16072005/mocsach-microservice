@@ -1,5 +1,5 @@
 import { jwtDecode } from "jwt-decode";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 //hàm generic nhận vào một component WrappedComponent có props kiểu P.
