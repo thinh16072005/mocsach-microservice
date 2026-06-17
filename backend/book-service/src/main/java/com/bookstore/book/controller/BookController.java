@@ -1,5 +1,6 @@
 package com.bookstore.book.controller;
 
+import com.bookstore.book.entity.Book;
 import com.bookstore.common.dto.response.ApiResponse;
 import com.bookstore.book.dto.response.BookListResponse;
 import com.bookstore.book.service.BookService;
@@ -37,5 +38,11 @@ public class BookController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         return ResponseEntity.ok(bookService.searchBooks(name, genreId, page, size));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<Book>> getBookById(@PathVariable int id) {
+        ApiResponse<Book> response = bookService.getBookById(id);
+        return response.isSuccess() ? ResponseEntity.ok(response) : ResponseEntity.badRequest().body(response);
     }
 }
