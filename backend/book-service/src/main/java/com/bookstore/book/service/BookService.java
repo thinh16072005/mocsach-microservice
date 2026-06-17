@@ -54,6 +54,12 @@ public class BookService {
         return ApiResponse.success("OK", result.map(BookListResponse::from));
     }
 
+    public ApiResponse<Book> getBookById(int id) {
+        Book book = bookRepository.findById(id)
+                .orElse(null);
+        return book != null ? ApiResponse.success("OK", book) : ApiResponse.error("Không tìm thấy sách!");
+    }
+
     // PRIVATE METHODS ----------------------------------
 
     private static void initImages(List<Book> books) {
