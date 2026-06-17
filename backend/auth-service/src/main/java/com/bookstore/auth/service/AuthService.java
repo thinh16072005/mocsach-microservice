@@ -167,22 +167,32 @@ public class AuthService {
             return ApiResponse.error("Email đã tồn tại.");
         }
 
-        AuthUser authUser = createAndSaveAuthUser(request.getUsername(), request.getPassword(),
-                request.getEmail(), "CUSTOMER");
+        AuthUser authUser = AuthUser.builder()
+                .username(request.getUsername())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .email(request.getEmail())
+                .enabled(true) // Auto-activate admin-created account
+                .activationCode(null)
+                .role("CUSTOMER")
+                .build();
+        authUserRepository.save(authUser);
 
         try {
             userClient.initUserProfile(Map.of(
                     "userId", authUser.getId(),
                     "email", authUser.getEmail(),
                     "firstName", request.getFirstName() != null ? request.getFirstName() : "",
-                    "lastName", request.getLastName() != null ? request.getLastName() : ""
+                    "lastName", request.getLastName() != null ? request.getLastName() : "",
+                    "phoneNumber", request.getPhoneNumber() != null ? request.getPhoneNumber() : "",
+                    "gender", request.getGender() != null ? request.getGender() : "",
+                    "dateOfBirth", request.getDateOfBirth() != null ? request.getDateOfBirth() : "",
+                    "deliveryAddress", request.getDeliveryAddress() != null ? request.getDeliveryAddress() : ""
             ));
         } catch (Exception e) {
             log.warn("Could not init user profile: {}", e.getMessage());
         }
 
-        emailService.sendActivationEmail(authUser.getEmail(), authUser.getActivationCode());
-        return ApiResponse.success("Người dùng được tạo thành công! Email xác nhận đã được gửi.");
+        return ApiResponse.success("Người dùng được tạo thành công!");
     }
 
     public ApiResponse<List<com.bookstore.common.dto.shared.AuthUserDto>> getAllUsers() {
