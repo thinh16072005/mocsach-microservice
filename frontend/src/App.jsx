@@ -11,6 +11,8 @@ import ActiveAccount from './layout/user/ActiveAccount';
 import LoginPage from './layout/user/LoginPage';
 import { ForgotPassword } from './layout/user/ForgotPassword';
 import ProfilePage from './layout/user/ProfilePage';
+import AdminLayout from './layout/admin/AdminLayout';
+import UserManagement from './layout/admin/UserManagement';
 
 const MyRoutes = () => {
     const [reloadAvatar, setReloadAvatar] = useState(0);
@@ -32,6 +34,11 @@ const MyRoutes = () => {
                 <Route path='/profile' element={<ProfilePage />} />
                 <Route path='/active' element={<ActiveAccount />} />
                 <Route path='/active/:email/:activationCode' element={<ActiveAccount />} />
+
+                {/* Admin Routes */}
+                <Route path='/admin' element={<AdminLayout />}>
+                    <Route path='users' element={<UserManagement />} />
+                </Route>
 
                 {!isAdminPath && (
                     <Route path='*' element={<Error404Page />} />

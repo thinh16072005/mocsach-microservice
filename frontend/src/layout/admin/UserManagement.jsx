@@ -28,6 +28,8 @@ import {
     checkPhoneNumber,
     validateDateOfBirth } from "../utils/Validation.js";
 
+const IS_READ_ONLY = true;
+
 // Helper để reset form
 const getEmptyUserForm = () => ({
     username: "",
@@ -770,13 +772,15 @@ const UserManagement = () => {
                             style={{ width: 300, paddingLeft: "34px", borderRadius: "8px", border: "1.5px solid #E2E8F0", fontSize: "13.5px" }}
                         />
                     </div>
-                    <button
-                        className='btn btn-primary'
-                        onClick={() => setShowAddForm(true)}
-                        style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
-                    >
-                        <AddIcon sx={{ fontSize: 18 }} /> Thêm người dùng
-                    </button>
+                    {!IS_READ_ONLY && (
+                        <button
+                            className='btn btn-primary'
+                            onClick={() => setShowAddForm(true)}
+                            style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+                        >
+                            <AddIcon sx={{ fontSize: 18 }} /> Thêm người dùng
+                        </button>
+                    )}
                 </div>
             </div>
 
@@ -792,15 +796,15 @@ const UserManagement = () => {
                                 <th>Số điện thoại</th>
                                 <th>Ngày sinh</th>
                                 <th>Trạng thái</th>
-                                <th>Hành động</th>
+                                {!IS_READ_ONLY && <th>Hành động</th>}
                             </tr>
                         </thead>
                         <tbody>
                             {loading && (
-                                <tr><td colSpan={8} className='text-center'>⏳ Đang tải...</td></tr>
+                                <tr><td colSpan={IS_READ_ONLY ? 7 : 8} className='text-center'>⏳ Đang tải...</td></tr>
                             )}
                             {!loading && filtered.length === 0 && (
-                                <tr><td colSpan={8} className='text-center'>Không có dữ liệu</td></tr>
+                                <tr><td colSpan={IS_READ_ONLY ? 7 : 8} className='text-center'>Không có dữ liệu</td></tr>
                             )}
                             {!loading && filtered.map(u => (
                                 <tr key={u.idUser}>
@@ -815,55 +819,57 @@ const UserManagement = () => {
                                             {u.enabled ? 'Đang hoạt động' : 'Đã khóa'}
                                         </span>
                                     </td>
-                                    <td>
-                                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                                            <button
-                                                onClick={() => handleOpenEditForm(u)}
-                                                title="Chỉnh sửa"
-                                                style={{
-                                                    padding: '6px 14px', borderRadius: '8px',
-                                                    border: '1.5px solid #2C7B8F', background: 'transparent',
-                                                    color: '#2C7B8F', cursor: 'pointer',
-                                                    transition: 'all 0.18s ease', lineHeight: 1,
-                                                }}
-                                                onMouseEnter={e => { e.currentTarget.style.background = '#2C7B8F'; e.currentTarget.style.color = '#fff'; }}
-                                                onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#2C7B8F'; }}
-                                            >
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontFamily: "'DM Sans', sans-serif", fontSize: '13px', fontWeight: 600 }}>
-                                                    <EditIcon sx={{ fontSize: 13 }} /> Sửa
-                                                </div>
-                                            </button>
-                                            <button
-                                                onClick={() => onToggleStatus(u)}
-                                                title={u.enabled ? 'Khóa tài khoản' : 'Mở khóa'}
-                                                style={{
-                                                    padding: '6px 14px', borderRadius: '8px',
-                                                    border: `1.5px solid ${u.enabled ? '#EF4444' : '#16A34A'}`,
-                                                    background: 'transparent',
-                                                    color: u.enabled ? '#EF4444' : '#16A34A',
-                                                    cursor: 'pointer',
-                                                    transition: 'all 0.18s ease', lineHeight: 1,
-                                                }}
-                                                onMouseEnter={e => {
-                                                    const c = u.enabled ? '#EF4444' : '#16A34A';
-                                                    e.currentTarget.style.background = c; e.currentTarget.style.color = '#fff';
-                                                }}
-                                                onMouseLeave={e => {
-                                                    e.currentTarget.style.background = 'transparent';
-                                                    e.currentTarget.style.color = u.enabled ? '#EF4444' : '#16A34A';
-                                                }}
-                                            >
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontFamily: "'DM Sans', sans-serif", fontSize: '13px', fontWeight: 600 }}>
-                                                    {u.enabled ? (
-                                                        <LockIcon sx={{ fontSize: 13 }} />
-                                                    ) : (
-                                                        <LockOpenIcon sx={{ fontSize: 13 }} />
-                                                    )}
-                                                    {u.enabled ? 'Khóa' : 'Mở'}
-                                                </div>
-                                            </button>
-                                        </div>
-                                    </td>
+                                    {!IS_READ_ONLY && (
+                                        <td>
+                                            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                                <button
+                                                    onClick={() => handleOpenEditForm(u)}
+                                                    title="Chỉnh sửa"
+                                                    style={{
+                                                        padding: '6px 14px', borderRadius: '8px',
+                                                        border: '1.5px solid #2C7B8F', background: 'transparent',
+                                                        color: '#2C7B8F', cursor: 'pointer',
+                                                        transition: 'all 0.18s ease', lineHeight: 1,
+                                                    }}
+                                                    onMouseEnter={e => { e.currentTarget.style.background = '#2C7B8F'; e.currentTarget.style.color = '#fff'; }}
+                                                    onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#2C7B8F'; }}
+                                                >
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontFamily: "'DM Sans', sans-serif", fontSize: '13px', fontWeight: 600 }}>
+                                                        <EditIcon sx={{ fontSize: 13 }} /> Sửa
+                                                    </div>
+                                                </button>
+                                                <button
+                                                    onClick={() => onToggleStatus(u)}
+                                                    title={u.enabled ? 'Khóa tài khoản' : 'Mở khóa'}
+                                                    style={{
+                                                        padding: '6px 14px', borderRadius: '8px',
+                                                        border: `1.5px solid ${u.enabled ? '#EF4444' : '#16A34A'}`,
+                                                        background: 'transparent',
+                                                        color: u.enabled ? '#EF4444' : '#16A34A',
+                                                        cursor: 'pointer',
+                                                        transition: 'all 0.18s ease', lineHeight: 1,
+                                                    }}
+                                                    onMouseEnter={e => {
+                                                        const c = u.enabled ? '#EF4444' : '#16A34A';
+                                                        e.currentTarget.style.background = c; e.currentTarget.style.color = '#fff';
+                                                    }}
+                                                    onMouseLeave={e => {
+                                                        e.currentTarget.style.background = 'transparent';
+                                                        e.currentTarget.style.color = u.enabled ? '#EF4444' : '#16A34A';
+                                                    }}
+                                                >
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontFamily: "'DM Sans', sans-serif", fontSize: '13px', fontWeight: 600 }}>
+                                                        {u.enabled ? (
+                                                            <LockIcon sx={{ fontSize: 13 }} />
+                                                        ) : (
+                                                            <LockOpenIcon sx={{ fontSize: 13 }} />
+                                                        )}
+                                                        {u.enabled ? 'Khóa' : 'Mở'}
+                                                    </div>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    )}
                                 </tr>
                             ))}
                         </tbody>

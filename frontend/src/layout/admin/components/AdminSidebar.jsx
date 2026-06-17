@@ -12,12 +12,7 @@ import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 
 const NAV_ITEMS = [
-    { to: '/admin/books', icon: <BookIcon sx={{ fontSize: 18 }} />, label: 'Sách' },
-    { to: '/admin/genres', icon: <CategoryIcon sx={{ fontSize: 18 }} />, label: 'Thể loại' },
     { to: '/admin/users', icon: <PeopleIcon sx={{ fontSize: 18 }} />, label: 'Tài khoản' },
-    { to: '/admin/orders', icon: <ShoppingCartIcon sx={{ fontSize: 18 }} />, label: 'Đơn hàng' },
-    { to: '/admin/feedback', icon: <FeedbackIcon sx={{ fontSize: 18 }} />, label: 'Feedback' },
-    { to: '/admin/coupon', icon: <LocalOfferIcon sx={{ fontSize: 18 }} />, label: 'Mã giảm giá' },
 ];
 
 const AdminSidebar = () => {

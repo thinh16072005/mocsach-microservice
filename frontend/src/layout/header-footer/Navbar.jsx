@@ -5,11 +5,13 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
+import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
 import {
     getAvatarByToken,
     getLastNameByToken,
     isToken,
     logout,
+    getRoleByToken,
 } from "../utils/JwtService";
 
 const Navbar = () => {
@@ -236,6 +238,11 @@ const AvatarDropdown = ({ navigate, avatar, lastName }) => {
                     <Link to='/profile' className='ms-dropdown-item' onClick={() => setOpen(false)}>
                         <AccountCircleIcon sx={{ fontSize: '18px', color: '#2C7B8F' }} /> Tài khoản của tôi
                     </Link>
+                    {getRoleByToken() === "ADMIN" && (
+                        <Link to='/admin/users' className='ms-dropdown-item' onClick={() => setOpen(false)}>
+                            <AdminPanelSettingsIcon sx={{ fontSize: '18px', color: '#4F46E5' }} /> Quản trị Admin
+                        </Link>
+                    )}
                     <div className='ms-dropdown-sep' />
                     <button className='ms-dropdown-item danger' onClick={() => { setOpen(false); logout(navigate); }}>
                         <ExitToAppIcon sx={{ fontSize: '18px' }} /> Đăng xuất
