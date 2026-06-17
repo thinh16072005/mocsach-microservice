@@ -536,12 +536,13 @@ const ProfilePage = () => {
                                 onChange={(e, newValue) => setCurrentTab(newValue)}
                                 aria-label="profile tabs"
                             >
+                                <Tab label="Thông tin cá nhân" />
                                 <Tab label="Đổi mật khẩu" />
                             </Tabs>
                         </Box>
 
-                        {/* Tab Panel: Thông tin cá nhân (disabled for Step 4, enabled in Step 5) */}
-                        {false && currentTab === 0 && (
+                        {/* Tab Panel: Thông tin cá nhân */}
+                        {currentTab === 0 && (
                             <div className='py-3 position-relative'>
                                 <h4 className='mb-4'>Thông tin cá nhân</h4>
                                 {/* Edit profile disabled in Step 4/5, enabled in Step 6 */}
@@ -764,7 +765,7 @@ const ProfilePage = () => {
                         )}
 
                         {/* Tab Panel: Đổi mật khẩu */}
-                        {currentTab === 0 && (
+                        {currentTab === 1 && (
                             <div className='py-3'>
                                 <h4 className='mb-4'>Đổi mật khẩu</h4>
                                 <form onSubmit={handleChangePasswordSubmit} className='form' style={{ padding: "0 20px" }}>
