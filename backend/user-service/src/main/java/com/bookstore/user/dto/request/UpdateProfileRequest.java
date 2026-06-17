@@ -1,15 +1,15 @@
 package com.bookstore.user.dto.request;
 
 import lombok.Data;
-import java.sql.Date;
+import java.util.Date;
 
 @Data
 public class UpdateProfileRequest {
     private String firstName;
     private String lastName;
     private String phoneNumber;
-    private Character gender;
-    private Date dateOfBirth;
     private String deliveryAddress;
+    private Date dateOfBirth;
+    private String gender;
     private String avatar;
 }
