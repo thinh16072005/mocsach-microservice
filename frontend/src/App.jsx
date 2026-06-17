@@ -10,6 +10,7 @@ import RegisterPage from './layout/user/RegisterPage';
 import ActiveAccount from './layout/user/ActiveAccount';
 import LoginPage from './layout/user/LoginPage';
 import { ForgotPassword } from './layout/user/ForgotPassword';
+import ProfilePage from './layout/user/ProfilePage';
 
 const MyRoutes = () => {
     const [reloadAvatar, setReloadAvatar] = useState(0);
@@ -28,6 +29,7 @@ const MyRoutes = () => {
                 <Route path='/register' element={<RegisterPage />} />
                 <Route path='/login' element={<LoginPage />} />
                 <Route path='/forgot-password' element={<ForgotPassword />} />
+                <Route path='/profile' element={<ProfilePage />} />
                 <Route path='/active' element={<ActiveAccount />} />
                 <Route path='/active/:email/:activationCode' element={<ActiveAccount />} />
 

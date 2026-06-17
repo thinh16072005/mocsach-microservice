@@ -471,38 +471,41 @@ const ProfilePage = () => {
                                 src={profileUser.avatar || "/images/user/user-default.jpg"}
                                 sx={{ width: 100, height: 100 }}
                             />
-                            <label htmlFor="avatar-upload" style={{ cursor: "pointer" }}>
-                                <Input
-                                    accept="image/*"
-                                    id="avatar-upload"
-                                    type="file"
-                                    onChange={handleAvatarChange}
-                                    disabled={isUploadingAvatar}
-                                />
-                                <IconButton
-                                    color="primary"
-                                    aria-label="upload avatar"
-                                    component="span"
-                                    disabled={isUploadingAvatar}
-                                    sx={{
-                                        position: "absolute",
-                                        bottom: 0,
-                                        right: "calc(50% - 50px)",
-                                        backgroundColor: "white",
-                                        "&:hover": {
-                                            backgroundColor: "rgba(255, 255, 255, 0.9)",
-                                        },
-                                    }}
-                                >
-                                    {isUploadingAvatar ? (
-                                        <div className="spinner-border spinner-border-sm" role="status">
-                                            <span className="visually-hidden">Loading...</span>
-                                        </div>
-                                    ) : (
-                                        <PhotoCamera />
-                                    )}
-                                </IconButton>
-                            </label>
+                            {/* Avatar upload disabled in Step 4/5, enabled in Step 6 */}
+                            {false && (
+                                <label htmlFor="avatar-upload" style={{ cursor: "pointer" }}>
+                                    <Input
+                                        accept="image/*"
+                                        id="avatar-upload"
+                                        type="file"
+                                        onChange={handleAvatarChange}
+                                        disabled={isUploadingAvatar}
+                                    />
+                                    <IconButton
+                                        color="primary"
+                                        aria-label="upload avatar"
+                                        component="span"
+                                        disabled={isUploadingAvatar}
+                                        sx={{
+                                            position: "absolute",
+                                            bottom: 0,
+                                            right: "calc(50% - 50px)",
+                                            backgroundColor: "white",
+                                            "&:hover": {
+                                                backgroundColor: "rgba(255, 255, 255, 0.9)",
+                                            },
+                                        }}
+                                    >
+                                        {isUploadingAvatar ? (
+                                            <div className="spinner-border spinner-border-sm" role="status">
+                                                <span className="visually-hidden">Loading...</span>
+                                            </div>
+                                        ) : (
+                                            <PhotoCamera />
+                                        )}
+                                    </IconButton>
+                                </label>
+                            )}
                         </div>
 
                         <div className='text-center mt-3'>
@@ -533,17 +536,16 @@ const ProfilePage = () => {
                                 onChange={(e, newValue) => setCurrentTab(newValue)}
                                 aria-label="profile tabs"
                             >
-                                <Tab label="Thông tin cá nhân" />
-                                <Tab label="Đơn hàng" />
                                 <Tab label="Đổi mật khẩu" />
                             </Tabs>
                         </Box>
 
-                        {/* Tab Panel: Thông tin cá nhân */}
-                        {currentTab === 0 && (
+                        {/* Tab Panel: Thông tin cá nhân (disabled for Step 4, enabled in Step 5) */}
+                        {false && currentTab === 0 && (
                             <div className='py-3 position-relative'>
                                 <h4 className='mb-4'>Thông tin cá nhân</h4>
-                                {!isEditMode && (
+                                {/* Edit profile disabled in Step 4/5, enabled in Step 6 */}
+                                {false && !isEditMode && (
                                     <div
                                         className='position-absolute'
                                         style={{
@@ -761,15 +763,8 @@ const ProfilePage = () => {
                             </div>
                         )}
 
-                        {/* Tab Panel: Xem đơn hàng */}
-                        {currentTab === 1 && (
-                            <div>
-                                <OrderTable/>
-                            </div>
-                        )}
-
                         {/* Tab Panel: Đổi mật khẩu */}
-                        {currentTab === 2 && (
+                        {currentTab === 0 && (
                             <div className='py-3'>
                                 <h4 className='mb-4'>Đổi mật khẩu</h4>
                                 <form onSubmit={handleChangePasswordSubmit} className='form' style={{ padding: "0 20px" }}>
