@@ -1,6 +1,7 @@
 package com.bookstore.user.controller;
 
 import com.bookstore.common.dto.response.ApiResponse;
+import com.bookstore.user.dto.request.UpdateProfileRequest;
 import com.bookstore.user.entity.User;
 import com.bookstore.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -97,6 +98,27 @@ public class UserController {
     @GetMapping("/search/existsByUsername")
     public ResponseEntity<Boolean> existsByUsername(@RequestParam String username) {
         return ResponseEntity.ok(userService.existsByUsername(username));
+    }
+
+    @PutMapping("/profile")
+    public ResponseEntity<ApiResponse<User>> updateUserProfile(
+            @RequestHeader("X-User-Id") int userId,
+            @RequestBody UpdateProfileRequest request) {
+        return ResponseEntity.ok(userService.updateUserProfile(userId, request));
+    }
+
+    @PutMapping("/{userId}")
+    public ResponseEntity<ApiResponse<User>> updateUserProfileById(
+            @RequestHeader("X-User-Id") int loggedInUserId,
+            @RequestHeader("X-User-Role") String loggedInUserRole,
+            @PathVariable("userId") int targetUserId,
+            @RequestBody UpdateProfileRequest request) {
+
+        if (!"ADMIN".equals(loggedInUserRole) && loggedInUserId != targetUserId) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(ApiResponse.error("Bạn không có quyền cập nhật thông tin này!"));
+        }
+        return ResponseEntity.ok(userService.updateUserProfile(targetUserId, request));
     }
 }
 

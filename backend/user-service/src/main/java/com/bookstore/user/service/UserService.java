@@ -1,6 +1,7 @@
 package com.bookstore.user.service;
 
 import com.bookstore.common.dto.response.ApiResponse;
+import com.bookstore.user.dto.request.UpdateProfileRequest;
 import com.bookstore.user.entity.User;
 import com.bookstore.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +13,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.bookstore.user.dto.request.ChangeAvatarRequest;
-import com.bookstore.user.dto.request.UpdateProfileRequest;
 import com.bookstore.user.util.Base64ToMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -54,6 +54,25 @@ public class UserService {
             return ApiResponse.error("Không tìm thấy thông tin người dùng!");
         }
         return ApiResponse.success("Lấy thông tin profile thành công!", user);
+    }
+
+    public ApiResponse<User> updateUserProfile(int userId, UpdateProfileRequest request) {
+        User user = userRepository.findById(userId)
+                .orElse(null);
+        if (user == null) {
+            return ApiResponse.error("Không tìm thấy thông tin người dùng!");
+        }
+
+        if (isNotBlank(request.getFirstName())) user.setFirstName(request.getFirstName());
+        if (isNotBlank(request.getLastName())) user.setLastName(request.getLastName());
+        if (isNotBlank(request.getPhoneNumber())) user.setPhoneNumber(request.getPhoneNumber());
+        if (isNotBlank(request.getGender())) user.setGender(request.getGender().charAt(0));
+        if (request.getDateOfBirth() != null) user.setDateOfBirth(new java.sql.Date(request.getDateOfBirth().getTime()));
+        if (request.getDeliveryAddress() != null) user.setDeliveryAddress(request.getDeliveryAddress());
+        if (isNotBlank(request.getAvatar())) user.setAvatar(request.getAvatar());
+
+        userRepository.save(user);
+        return ApiResponse.success("Cập nhật thông tin profile thành công!", user);
     }
 
     public ApiResponse<List<com.bookstore.user.dto.response.UserResponse>> getAllUsers() {
@@ -199,4 +218,3 @@ public class UserService {
         return ApiResponse.success("Cập nhật thành công.");
     }
 }
-

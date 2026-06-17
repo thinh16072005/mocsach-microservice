@@ -1,5 +1,5 @@
 import Avatar from "@mui/material/Avatar";
-import { useEffect, useLayoutEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import TextField from "@mui/material/TextField";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Radio from "@mui/material/Radio";
@@ -471,41 +471,38 @@ const ProfilePage = () => {
                                 src={profileUser.avatar || "/images/user/user-default.jpg"}
                                 sx={{ width: 100, height: 100 }}
                             />
-                            {/* Avatar upload disabled in Step 4/5, enabled in Step 6 */}
-                            {false && (
-                                <label htmlFor="avatar-upload" style={{ cursor: "pointer" }}>
-                                    <Input
-                                        accept="image/*"
-                                        id="avatar-upload"
-                                        type="file"
-                                        onChange={handleAvatarChange}
-                                        disabled={isUploadingAvatar}
-                                    />
-                                    <IconButton
-                                        color="primary"
-                                        aria-label="upload avatar"
-                                        component="span"
-                                        disabled={isUploadingAvatar}
-                                        sx={{
-                                            position: "absolute",
-                                            bottom: 0,
-                                            right: "calc(50% - 50px)",
-                                            backgroundColor: "white",
-                                            "&:hover": {
-                                                backgroundColor: "rgba(255, 255, 255, 0.9)",
-                                            },
-                                        }}
-                                    >
-                                        {isUploadingAvatar ? (
-                                            <div className="spinner-border spinner-border-sm" role="status">
-                                                <span className="visually-hidden">Loading...</span>
-                                            </div>
-                                        ) : (
-                                            <PhotoCamera />
-                                        )}
-                                    </IconButton>
-                                </label>
-                            )}
+                            <label htmlFor="avatar-upload" style={{ cursor: "pointer" }}>
+                                <Input
+                                    accept="image/*"
+                                    id="avatar-upload"
+                                    type="file"
+                                    onChange={handleAvatarChange}
+                                    disabled={isUploadingAvatar}
+                                />
+                                <IconButton
+                                    color="primary"
+                                    aria-label="upload avatar"
+                                    component="span"
+                                    disabled={isUploadingAvatar}
+                                    sx={{
+                                        position: "absolute",
+                                        bottom: 0,
+                                        right: "calc(50% - 50px)",
+                                        backgroundColor: "white",
+                                        "&:hover": {
+                                            backgroundColor: "rgba(255, 255, 255, 0.9)",
+                                        },
+                                    }}
+                                >
+                                    {isUploadingAvatar ? (
+                                        <div className="spinner-border spinner-border-sm" role="status">
+                                            <span className="visually-hidden">Loading...</span>
+                                        </div>
+                                    ) : (
+                                        <PhotoCamera />
+                                    )}
+                                </IconButton>
+                            </label>
                         </div>
 
                         <div className='text-center mt-3'>
@@ -545,8 +542,7 @@ const ProfilePage = () => {
                         {currentTab === 0 && (
                             <div className='py-3 position-relative'>
                                 <h4 className='mb-4'>Thông tin cá nhân</h4>
-                                {/* Edit profile disabled in Step 4/5, enabled in Step 6 */}
-                                {false && !isEditMode && (
+                                {!isEditMode && (
                                     <div
                                         className='position-absolute'
                                         style={{
