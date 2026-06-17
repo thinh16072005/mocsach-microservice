@@ -2,9 +2,12 @@ import React from "react";
 import { Link } from "react-router-dom";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
 import useScrollToTop from "../../hooks/ScrollToTop";
+import { isToken, getLastNameByToken } from "../utils/JwtService";
 
 const HomePage = () => {
     useScrollToTop();
+    const loggedIn = isToken();
+    const lastName = getLastNameByToken();
 
     return (
         <div style={{
@@ -39,50 +42,121 @@ const HomePage = () => {
                 }}>
                     <MenuBookIcon sx={{ color: "#fff", fontSize: 40 }} />
                 </div>
-                <h1 style={{
-                    fontSize: "42px",
-                    fontWeight: 700,
-                    color: "#0F172A",
-                    marginBottom: "16px",
-                    letterSpacing: "-0.5px"
-                }}>
-                    Chào mừng bạn đến với <span style={{ color: "#2C7B8F" }}>Mộc Sách</span>
-                </h1>
-                <p style={{
-                    fontSize: "18px",
-                    color: "#475569",
-                    lineHeight: 1.6,
-                    marginBottom: "36px",
-                    maxWidth: "600px",
-                    marginLeft: "auto",
-                    marginRight: "auto"
-                }}>
-                    Nền tảng chia sẻ tri thức và kết nối đam mê đọc sách. Hãy tạo tài khoản ngay hôm nay để bắt đầu hành trình khám phá thế giới tri thức vô tận của chúng tôi.
-                </p>
-                <div>
-                    <Link to="/register" style={{
-                        display: "inline-block",
-                        padding: "14px 32px",
-                        fontSize: "16px",
-                        fontWeight: 600,
-                        color: "#fff",
-                        background: "linear-gradient(135deg, #2C7B8F 0%, #1A5E70 100%)",
-                        borderRadius: "12px",
-                        textDecoration: "none",
-                        boxShadow: "0 10px 20px rgba(44, 123, 143, 0.2)",
-                        transition: "all 0.2s ease"
-                    }}
-                    onMouseEnter={(e) => {
-                        e.currentTarget.style.transform = "translateY(-2px)";
-                        e.currentTarget.style.boxShadow = "0 12px 24px rgba(44, 123, 143, 0.3)";
-                    }}
-                    onMouseLeave={(e) => {
-                        e.currentTarget.style.transform = "none";
-                        e.currentTarget.style.boxShadow = "0 10px 20px rgba(44, 123, 143, 0.2)";
-                    }}>
-                        Đăng ký tài khoản mới
-                    </Link>
-                </div>
+                {loggedIn ? (
+                    <>
+                        <h1 style={{
+                            fontSize: "42px",
+                            fontWeight: 700,
+                            color: "#0F172A",
+                            marginBottom: "16px",
+                            letterSpacing: "-0.5px"
+                        }}>
+                            Chào mừng quay trở lại, <span style={{ color: "#2C7B8F" }}>{lastName || "bạn đọc"}</span>!
+                        </h1>
+                        <p style={{
+                            fontSize: "18px",
+                            color: "#475569",
+                            lineHeight: 1.6,
+                            marginBottom: "36px",
+                            maxWidth: "600px",
+                            marginLeft: "auto",
+                            marginRight: "auto"
+                        }}>
+                            Chúc bạn có một ngày đọc sách và học tập thật hiệu quả tại Mộc Sách. Bạn có thể truy cập trang hồ sơ cá nhân để quản lý tài khoản của mình.
+                        </p>
+                        <div style={{ display: "flex", gap: "16px", justifyContent: "center" }}>
+                            <Link to="/profile" style={{
+                                display: "inline-block",
+                                padding: "14px 32px",
+                                fontSize: "16px",
+                                fontWeight: 600,
+                                color: "#fff",
+                                background: "linear-gradient(135deg, #2C7B8F 0%, #1A5E70 100%)",
+                                borderRadius: "12px",
+                                textDecoration: "none",
+                                boxShadow: "0 10px 20px rgba(44, 123, 143, 0.2)",
+                                transition: "all 0.2s ease"
+                            }}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.transform = "translateY(-2px)";
+                                e.currentTarget.style.boxShadow = "0 12px 24px rgba(44, 123, 143, 0.3)";
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.transform = "none";
+                                e.currentTarget.style.boxShadow = "0 10px 20px rgba(44, 123, 143, 0.2)";
+                            }}>
+                                Hồ sơ cá nhân
+                            </Link>
+                        </div>
+                    </>
+                ) : (
+                    <>
+                        <h1 style={{
+                            fontSize: "42px",
+                            fontWeight: 700,
+                            color: "#0F172A",
+                            marginBottom: "16px",
+                            letterSpacing: "-0.5px"
+                        }}>
+                            Chào mừng bạn đến với <span style={{ color: "#2C7B8F" }}>Mộc Sách</span>
+                        </h1>
+                        <p style={{
+                            fontSize: "18px",
+                            color: "#475569",
+                            lineHeight: 1.6,
+                            marginBottom: "36px",
+                            maxWidth: "600px",
+                            marginLeft: "auto",
+                            marginRight: "auto"
+                        }}>
+                            Nền tảng chia sẻ tri thức và kết nối đam mê đọc sách. Hãy tạo tài khoản hoặc đăng nhập để bắt đầu hành trình khám phá thế giới tri thức vô tận của chúng tôi.
+                        </p>
+                        <div style={{ display: "flex", gap: "16px", justifyContent: "center" }}>
+                            <Link to="/login" style={{
+                                display: "inline-block",
+                                padding: "14px 32px",
+                                fontSize: "16px",
+                                fontWeight: 600,
+                                color: "#2C7B8F",
+                                background: "transparent",
+                                border: "1.5px solid #2C7B8F",
+                                borderRadius: "12px",
+                                textDecoration: "none",
+                                transition: "all 0.2s ease"
+                            }}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.background = "#EEF8FA";
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.background = "transparent";
+                            }}>
+                                Đăng nhập
+                            </Link>
+                            <Link to="/register" style={{
+                                display: "inline-block",
+                                padding: "14px 32px",
+                                fontSize: "16px",
+                                fontWeight: 600,
+                                color: "#fff",
+                                background: "linear-gradient(135deg, #2C7B8F 0%, #1A5E70 100%)",
+                                borderRadius: "12px",
+                                textDecoration: "none",
+                                boxShadow: "0 10px 20px rgba(44, 123, 143, 0.2)",
+                                transition: "all 0.2s ease"
+                            }}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.transform = "translateY(-2px)";
+                                e.currentTarget.style.boxShadow = "0 12px 24px rgba(44, 123, 143, 0.3)";
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.transform = "none";
+                                e.currentTarget.style.boxShadow = "0 10px 20px rgba(44, 123, 143, 0.2)";
+                            }}>
+                                Đăng ký
+                            </Link>
+                        </div>
+                    </>
+                )}
             </div>
         </div>
     );

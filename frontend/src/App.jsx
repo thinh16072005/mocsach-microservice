@@ -8,6 +8,7 @@ import Navbar from './layout/header-footer/Navbar';
 import Footer from './layout/header-footer/Footer';
 import RegisterPage from './layout/user/RegisterPage';
 import ActiveAccount from './layout/user/ActiveAccount';
+import LoginPage from './layout/user/LoginPage';
 
 const MyRoutes = () => {
     const [reloadAvatar, setReloadAvatar] = useState(0);
@@ -24,6 +25,7 @@ const MyRoutes = () => {
                 <Route path='/error-403' element={<Error403Page />} />
                 <Route path='/error-404' element={<Error404Page />} />
                 <Route path='/register' element={<RegisterPage />} />
+                <Route path='/login' element={<LoginPage />} />
                 <Route path='/active' element={<ActiveAccount />} />
                 <Route path='/active/:email/:activationCode' element={<ActiveAccount />} />
 
