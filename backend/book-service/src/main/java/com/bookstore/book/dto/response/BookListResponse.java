@@ -3,7 +3,6 @@
 import com.bookstore.book.entity.Book;
 import com.bookstore.book.entity.Genre;
 import com.bookstore.book.entity.Image;
-import com.bookstore.common.dto.shared.BookDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
