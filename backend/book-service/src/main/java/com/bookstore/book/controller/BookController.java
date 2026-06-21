@@ -1,13 +1,16 @@
 package com.bookstore.book.controller;
 
+import com.bookstore.book.dto.request.CreateBookRequest;
 import com.bookstore.book.entity.Book;
 import com.bookstore.common.dto.response.ApiResponse;
 import com.bookstore.book.dto.response.BookListResponse;
 import com.bookstore.book.service.BookService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -43,6 +46,14 @@ public class BookController {
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<Book>> getBookById(@PathVariable int id) {
         ApiResponse<Book> response = bookService.getBookById(id);
+        return response.isSuccess() ? ResponseEntity.ok(response) : ResponseEntity.badRequest().body(response);
+    }
+
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ApiResponse<Book>> createBook(
+            @RequestPart("data") CreateBookRequest request,
+            @RequestPart(value = "images", required = false) List<MultipartFile> images) {
+        ApiResponse<Book> response = bookService.createBook(request, images);
         return response.isSuccess() ? ResponseEntity.ok(response) : ResponseEntity.badRequest().body(response);
     }
 }

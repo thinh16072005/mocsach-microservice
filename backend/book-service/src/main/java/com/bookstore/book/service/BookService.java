@@ -1,6 +1,11 @@
 package com.bookstore.book.service;
 
+import com.bookstore.book.dto.request.CreateBookRequest;
 import com.bookstore.book.dto.response.BookListResponse;
+import com.bookstore.book.entity.Genre;
+import com.bookstore.book.entity.Image;
+import com.bookstore.book.repository.GenreRepository;
+import com.bookstore.book.repository.ImageRepository;
 import com.bookstore.common.dto.response.ApiResponse;
 import com.bookstore.book.entity.Book;
 import com.bookstore.book.repository.BookRepository;
@@ -12,7 +17,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -20,6 +27,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BookService {
     private final BookRepository bookRepository;
+    private final GenreRepository genreRepository;
+    private final ImageRepository imageRepository;
+    private final CloudinaryService cloudinaryService;
 
     public ApiResponse<Page<BookListResponse>> getBooks(int page, int size, String sort) {
         Pageable pageable = PageRequest.of(page, size, parseSort(sort));
@@ -60,6 +70,37 @@ public class BookService {
         return book != null ? ApiResponse.success("OK", book) : ApiResponse.error("Không tìm thấy sách!");
     }
 
+    @Transactional
+    public ApiResponse<Book> createBook(CreateBookRequest request, List<MultipartFile> images) {
+        if (request.getNameBook() == null || request.getNameBook().isBlank()) {
+            return ApiResponse.error("Tên sách không được để trống!");
+        }
+        if (request.getListPrice() <= 0) {
+            return ApiResponse.error("Giá niêm yết phải lớn hơn 0!");
+        }
+
+        List<Genre> genres = resolveGenres(request.getGenreIds());
+        if (genres == null) return ApiResponse.error("Có thể loại không tồn tại!");
+
+        Book book = Book.builder()
+                .nameBook(request.getNameBook())
+                .author(request.getAuthor())
+                .description(request.getDescription())
+                .listPrice(request.getListPrice())
+                .sellPrice(calculateSellPrice(request.getListPrice(), request.getDiscountPercent()))
+                .quantity(request.getQuantity())
+                .discountPercent(request.getDiscountPercent())
+                .avgRating(0.0)
+                .soldQuantity(0)
+                .genres(genres)
+                .build();
+
+        Book saved = bookRepository.save(book);
+        saveImages(saved, images);
+        log.info("Book created: id={}, name={}", saved.getIdBook(), saved.getNameBook());
+        return ApiResponse.success("Tạo sách thành công!", saved);
+    }
+
     // PRIVATE METHODS ----------------------------------
 
     private static void initImages(List<Book> books) {
@@ -78,5 +119,37 @@ public class BookService {
         String field = parts[0].trim();
         boolean asc = parts.length > 1 && "asc".equalsIgnoreCase(parts[1].trim());
         return asc ? Sort.by(field).ascending() : Sort.by(field).descending();
+    }
+
+    private double calculateSellPrice(double listPrice, int discountPercent) {
+        return listPrice - (listPrice * discountPercent / 100.0);
+    }
+
+    private List<Genre> resolveGenres(List<Integer> genreIds) {
+        if (genreIds == null || genreIds.isEmpty()) return null;
+        List<Genre> genres = new ArrayList<>();
+        for (int id : genreIds) {
+            Genre genre = genreRepository.findById(id).orElse(null);
+            if (genre == null) return null;
+            genres.add(genre);
+        }
+        return genres;
+    }
+
+    private void saveImages(Book book, List<MultipartFile> images) {
+        if (images == null || images.isEmpty()) return;
+        for (int i = 0; i < images.size(); i++) {
+            MultipartFile file = images.get(i);
+            if (file.isEmpty()) continue;
+            String url = cloudinaryService.uploadImage(file,
+                    "Book_" + book.getIdBook() + "_" + i + "_" + System.currentTimeMillis());
+            Image image = Image.builder()
+                    .book(book)
+                    .nameImage(file.getOriginalFilename())
+                    .urlImage(url)
+                    .thumbnail(i == 0)
+                    .build();
+            imageRepository.save(image);
+        }
     }
 }
