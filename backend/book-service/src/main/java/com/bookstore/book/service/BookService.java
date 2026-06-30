@@ -21,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -101,7 +102,53 @@ public class BookService {
         return ApiResponse.success("Tạo sách thành công!", saved);
     }
 
+    @Transactional
+    public ApiResponse<Book> updateBook(int id, CreateBookRequest request, List<MultipartFile> newImages,
+                                        List<Integer> keepImageIds) {
+        Book book = bookRepository.findById(id)
+                .orElse(null);
+        if (book == null) return ApiResponse.error("Không tìm thấy sách!");
+
+        List<Genre> genres = resolveGenres(request.getGenreIds());
+        if (genres == null) return ApiResponse.error("Có thể loại không tồn tại!");
+
+        applyBookUpdates(book, request, genres);
+        bookRepository.save(book);
+
+        // Áp dụng thay đổi ảnh khi có ảnh mới HOẶC khi client gửi keepImageIds
+        // (để hỗ trợ xóa ảnh cũ mà không cần upload ảnh mới).
+        boolean hasNewImages = newImages != null && !newImages.isEmpty();
+        if (hasNewImages || keepImageIds != null) {
+            handleImageUpdates(book, keepImageIds, newImages != null ? newImages : List.of());
+        }
+
+        return ApiResponse.success("Cập nhật sách thành công!", book);
+    }
+
+    public ApiResponse<Void> updateStock(int id, Map<String, Integer> request) {
+        Book book = bookRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy sách!"));
+        int delta = request.getOrDefault("delta", 0);
+        book.setQuantity(book.getQuantity() + delta);
+        if (delta < 0) {
+            book.setSoldQuantity(book.getSoldQuantity() + Math.abs(delta));
+        }
+        bookRepository.save(book);
+        return ApiResponse.success("Cập nhật tồn kho thành công!");
+    }
+
     // PRIVATE METHODS ----------------------------------
+
+    private void applyBookUpdates(Book book, CreateBookRequest request, List<Genre> genres) {
+        book.setNameBook(request.getNameBook());
+        book.setAuthor(request.getAuthor());
+        book.setDescription(request.getDescription());
+        book.setListPrice(request.getListPrice());
+        book.setSellPrice(calculateSellPrice(request.getListPrice(), request.getDiscountPercent()));
+        book.setQuantity(request.getQuantity());
+        book.setDiscountPercent(request.getDiscountPercent());
+        book.setGenres(genres);
+    }
 
     private static void initImages(List<Book> books) {
         books.forEach(b -> {
@@ -148,6 +195,31 @@ public class BookService {
                     .nameImage(file.getOriginalFilename())
                     .urlImage(url)
                     .thumbnail(i == 0)
+                    .build();
+            imageRepository.save(image);
+        }
+    }
+
+    private void handleImageUpdates(Book book, List<Integer> keepImageIds, List<MultipartFile> newImages) {
+        List<Image> current = imageRepository.findByBook_IdBook(book.getIdBook());
+        if (keepImageIds != null) {
+            current.stream()
+                    .filter(img -> !keepImageIds.contains(img.getIdImage()))
+                    .forEach(imageRepository::delete);
+        } else {
+            imageRepository.deleteAll(current);
+        }
+        int keepCount = keepImageIds != null ? keepImageIds.size() : 0;
+        for (int i = 0; i < newImages.size(); i++) {
+            MultipartFile file = newImages.get(i);
+            if (file.isEmpty()) continue;
+            String url = cloudinaryService.uploadImage(file,
+                    "Book_" + book.getIdBook() + "_" + System.currentTimeMillis() + "_" + i);
+            Image image = Image.builder()
+                    .book(book)
+                    .nameImage(file.getOriginalFilename())
+                    .urlImage(url)
+                    .thumbnail(keepCount == 0 && i == 0)
                     .build();
             imageRepository.save(image);
         }

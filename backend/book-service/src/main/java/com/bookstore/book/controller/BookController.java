@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/books")
@@ -55,5 +56,12 @@ public class BookController {
             @RequestPart(value = "images", required = false) List<MultipartFile> images) {
         ApiResponse<Book> response = bookService.createBook(request, images);
         return response.isSuccess() ? ResponseEntity.ok(response) : ResponseEntity.badRequest().body(response);
+    }
+
+    @PutMapping("/{id}/stock")
+    public ResponseEntity<ApiResponse<Void>> updateStock(
+            @PathVariable int id,
+            @RequestBody Map<String, Integer> request) {
+        return ResponseEntity.ok(bookService.updateStock(id, request));
     }
 }
